@@ -3,11 +3,13 @@ using System.Globalization;
 
 namespace MacrixPracticalTask_Client.Validation
 {
-    public class Validator
+    public class FillerValidator
     {
-        public static int ValidateNumber(string fieldName, bool checkForWhiteSpace = false)
+        public static int FillValidatedNumber(string fieldName, bool checkForWhiteSpace = false)
         {
             int number = 0;
+
+            Console.WriteLine("Please enter " + fieldName + (checkForWhiteSpace ? " (press enter to skip)" : "") + ":");
 
             while (true)
             {
@@ -53,9 +55,11 @@ namespace MacrixPracticalTask_Client.Validation
             return number;
         }
 
-        public static string ValidateString(string fieldName, bool checkForWhiteSpace = false)
+        public static string FillValidatedString(string fieldName, bool checkForWhiteSpace = true)
         {
             string line;
+
+            Console.WriteLine("Please enter " + fieldName + ":");
 
             while (true)
             {
@@ -82,9 +86,11 @@ namespace MacrixPracticalTask_Client.Validation
             return line;
         }
 
-        public static string ValidatePhoneNumber()
+        public static string FillValidatedPhoneNumber()
         {
             string phoneNumber;
+
+            Console.WriteLine("Please enter phone number (must start with '+'):");
 
             while (true)
             {
@@ -107,9 +113,11 @@ namespace MacrixPracticalTask_Client.Validation
             return phoneNumber;
         }
 
-        public static DateTime ValidateDate()
+        public static DateTime FillValidatedDate()
         {
             DateTime dateOfBirth;
+
+            Console.WriteLine("Please enter date of birth (in format dd/MM/yyyy):");
 
             while (true)
             {

@@ -9,10 +9,10 @@ namespace MacrixPracticalTask_Client
 {
     public class Program
     {
+        private static readonly API_Client _apiClient = new();
+
         static void Main(string[] args)
         {
-            API_Client apiClient = new();
-
             while (true)
             {
                 Console.WriteLine("Hello! " +
@@ -48,19 +48,19 @@ namespace MacrixPracticalTask_Client
                 switch (optionNumber)
                 {
                     case 1:
-                        CallGetAll(apiClient);
+                        CallGetAll();
                         break;
                     case 2:
-                        CallGetPersonById(apiClient);
+                        CallGetPersonById();
                         break;
                     case 3: 
-                        CallCreatePerson(apiClient);
+                        CallCreatePerson();
                         break;
                     case 4:
-                        CallUpdatePerson(apiClient);
+                        CallUpdatePerson();
                         break;
                     case 5:
-                        CallDeletePerson(apiClient);
+                        CallDeletePerson();
                         break;
                 }
 
@@ -108,18 +108,15 @@ namespace MacrixPracticalTask_Client
             }
         }
 
-        private static void CallGetAll(API_Client apiClient)
+        private static void CallGetAll()
         {
             int pageNumber = 1;
             int pageSize = 10;
             string orderBy = "lastName";
 
-            Console.WriteLine("Please enter page number (press enter to use the default option):");
-            int pageNumberEntered = Validator.ValidateNumber("page number", true);
+            int pageNumberEntered = FillerValidator.FillValidatedNumber("page number", true);
             pageNumber = pageNumberEntered == 0 ? pageNumber : pageNumberEntered;
-
-            Console.WriteLine("Please enter page size (press enter to use the default option):");
-            int pageSizeEntered = Validator.ValidateNumber("page size", true);
+            int pageSizeEntered = FillerValidator.FillValidatedNumber("page size", true);
             pageSize = pageSizeEntered == 0 ? pageSize : pageSizeEntered;
 
             Console.WriteLine("Please enter order by parameter (press enter to use the default option):");
@@ -129,7 +126,7 @@ namespace MacrixPracticalTask_Client
                 orderBy = orderByValue;
             }
 
-            (bool success, object result) = apiClient.GetAll(pageNumber, pageSize, orderBy).Result;
+            (bool success, object result) = _apiClient.GetAll(pageNumber, pageSize, orderBy).Result;
 
             if (success)
             {
@@ -152,12 +149,11 @@ namespace MacrixPracticalTask_Client
             }
         }
 
-        private static void CallGetPersonById(API_Client apiClient)
+        private static void CallGetPersonById()
         {
-            Console.WriteLine("Please enter person id:");
-            int idNumber = Validator.ValidateNumber("id");
+            int idNumber = FillerValidator.FillValidatedNumber("person id");
 
-            (bool success, object result) = apiClient.GetPersonById(idNumber).Result;
+            (bool success, object result) = _apiClient.GetPersonById(idNumber).Result;
 
             if (success)
             {
@@ -172,13 +168,11 @@ namespace MacrixPracticalTask_Client
             }
         }
 
-        private static void CallCreatePerson(API_Client apiClient)
+        private static void CallCreatePerson()
         {
-            PersonForCreationDTO person = new();
+            PersonForCreationDTO person = CreatePersonObject();
 
-            FillFields(person);
-
-            (bool success, object result) = apiClient.CreatePerson(person).Result;
+            (bool success, object result) = _apiClient.CreatePerson(person).Result;
 
             if (success)
             {
@@ -195,16 +189,13 @@ namespace MacrixPracticalTask_Client
             }
         }
 
-        private static void CallUpdatePerson(API_Client apiClient)
+        private static void CallUpdatePerson()
         {
-            PersonForCreationDTO person = new();
+            int idNumber = FillerValidator.FillValidatedNumber("person id");
 
-            Console.WriteLine("Please enter person id:");
-            int idNumber = Validator.ValidateNumber("id");
+            PersonForCreationDTO person = CreatePersonObject();
 
-            FillFields(person);
-
-            (bool success, object result) = apiClient.UpdatePerson(idNumber, person).Result;
+            (bool success, object result) = _apiClient.UpdatePerson(idNumber, person).Result;
 
             if (success)
             {
@@ -217,12 +208,11 @@ namespace MacrixPracticalTask_Client
             }
         }
 
-        private static void CallDeletePerson(API_Client apiClient)
+        private static void CallDeletePerson()
         {
-            Console.WriteLine("Please enter person id:");
-            int idNumber = Validator.ValidateNumber("id");
+            int idNumber = FillerValidator.FillValidatedNumber("person id");
 
-            (bool success, object result) = apiClient.DeletePerson(idNumber).Result;
+            (bool success, object result) = _apiClient.DeletePerson(idNumber).Result;
 
             if (success)
             {
@@ -235,43 +225,22 @@ namespace MacrixPracticalTask_Client
             }
         }
 
-        private static void FillFields(PersonForCreationDTO person)
+        private static PersonForCreationDTO CreatePersonObject()
         {
-            Console.WriteLine("Please enter last name:");
-            var lastName = Validator.ValidateString("last name", true);
-            person.lastName = lastName;
+            PersonForCreationDTO person = new()
+            {
+                lastName = FillerValidator.FillValidatedString("last name"),
+                firstName = FillerValidator.FillValidatedString("first name"),
+                streetName = FillerValidator.FillValidatedString("street name"),
+                houseNumber = FillerValidator.FillValidatedNumber("house number"),
+                apartmentNumber = FillerValidator.FillValidatedNumber("apartment number", true),
+                postalCode = FillerValidator.FillValidatedNumber("postal code"),
+                town = FillerValidator.FillValidatedString("town"),
+                phoneNumber = FillerValidator.FillValidatedPhoneNumber(),
+                dateOfBirth = FillerValidator.FillValidatedDate()
+            };
 
-            Console.WriteLine("Please enter first name:");
-            var firstName = Validator.ValidateString("first name", true);
-            person.firstName = firstName;
-
-            Console.WriteLine("Please enter street name:");
-            var streetName = Validator.ValidateString("street name", true);
-            person.streetName = streetName;
-
-            Console.WriteLine("Please enter house number:");
-            int houseNumber = Validator.ValidateNumber("house number");
-            person.houseNumber = houseNumber;
-
-            Console.WriteLine("Please enter apartment number (press enter to skip):");
-            int apartmentNumber = Validator.ValidateNumber("apartment number", true);
-            person.apartmentNumber = apartmentNumber;
-
-            Console.WriteLine("Please enter postal code:");
-            int postalCode = Validator.ValidateNumber("postal code");
-            person.postalCode = postalCode;
-
-            Console.WriteLine("Please enter town name:");
-            var town = Validator.ValidateString("town", true);
-            person.town = town;
-
-            Console.WriteLine("Please enter phone number (must start with '+'):");
-            var phoneNumber = Validator.ValidatePhoneNumber();
-            person.phoneNumber = phoneNumber;
-
-            Console.WriteLine("Please enter date of birth (in format dd/MM/yyyy):");
-            DateTime dateOfBirth = Validator.ValidateDate();
-            person.dateOfBirth = dateOfBirth;
+            return person;
         }
     }
 }
