@@ -1,5 +1,5 @@
 {
-  "MainUrl": "https://localhost:7257/api/",
+  "MainUrl": "http://localhost:5000/Person/",
   "MethodNames": {
     "GetAll": {
       "GetAllUrl": "GetAll",

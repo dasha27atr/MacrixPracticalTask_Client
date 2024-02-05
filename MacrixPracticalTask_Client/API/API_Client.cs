@@ -12,7 +12,13 @@ namespace MacrixPracticalTask_Client.API
         public API_Client()
         {
             Config = Utils.GetConfig();
-            client = new();
+
+            HttpClientHandler clientHandler = new()
+            {
+                ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => { return true; }
+            };
+
+            client = new(clientHandler);
         }
 
         public async Task<(bool, object)> GetAll(int pageNumber, int pageSize, string orderBy = "lastName")
@@ -33,7 +39,12 @@ namespace MacrixPracticalTask_Client.API
             }
             else
             {
-                return (false, "");
+                if (string.IsNullOrWhiteSpace(responseMessage))
+                {
+                    responseMessage = "No people found in the database.";
+                }
+
+                return (false, new Error(response.ReasonPhrase ?? "", (int)response.StatusCode, responseMessage));                
             }
         }
 
@@ -52,18 +63,22 @@ namespace MacrixPracticalTask_Client.API
             }
             else
             {
+                if (string.IsNullOrWhiteSpace(responseMessage))
+                {
+                    responseMessage = "The person you are trying to look up is not on the database.";
+                }
                 return (false, new Error(response.ReasonPhrase ?? "", (int)response.StatusCode, responseMessage));
             }
         }
 
         public async Task<(bool, object)> CreatePerson(PersonForCreationDTO person)
         {
-            string requestUri = Config.MainUrl + Config.MethodNames.CreatePersonUrl;
+            Uri uri = new(Config.MainUrl + Config.MethodNames.CreatePersonUrl);
 
             var personJson = Newtonsoft.Json.JsonConvert.SerializeObject(person);
             HttpContent content = new StringContent(personJson, Encoding.UTF8, "application/json");
 
-            HttpResponseMessage response = await client.PostAsync(requestUri, content);
+            HttpResponseMessage response = await client.PostAsync(uri, content);
             string responseMessage = await response.Content.ReadAsStringAsync();
 
             if (response.IsSuccessStatusCode)
