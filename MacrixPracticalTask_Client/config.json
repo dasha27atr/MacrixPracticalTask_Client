@@ -1,0 +1,15 @@
+{
+  "MainUrl": "https://localhost:7257/api/",
+  "MethodNames": {
+    "GetAll": {
+      "GetAllUrl": "GetAll",
+      "PageNumber": "PageNumber",
+      "PageSize": "PageSize",
+      "OrderBy": "OrderBy"
+    },
+    "GetPersonByIdUrl": "GetPersonById",
+    "CreatePersonUrl": "CreatePerson",
+    "UpdatePersonUrl": "UpdatePerson",
+    "DeletePersonUrl": "DeletePerson"
+  }
+}
